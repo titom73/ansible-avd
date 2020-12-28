@@ -716,6 +716,9 @@ ethernet_interfaces:
     speed: < interface_speed >
     mtu: < mtu >
     type: < routed | switched >
+    encapsulatioN:
+      dot1q:
+        vlan: < vlan-id >
     vrf: < vrf_name >
     ip_address: < IPv4_address/Mask >
     ip_address_secondaries:
