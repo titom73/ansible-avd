@@ -248,6 +248,13 @@ No VLANs defined
 
 *Inherited from Port-Channel Interface
 
+#### IPv4
+
+| Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
+| --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
+
+ *Inherited from Port-Channel Interface 
+
 ### Ethernet Interfaces Device Configuration
 
 ```eos
@@ -317,10 +324,12 @@ interface Port-Channel50
    lacp system-id 0303.0202.0101
 !
 interface Port-Channel100
+   logging event link-status
    no switchport
 !
 interface Port-Channel100.101
    description IFL for TENANT01
+   logging event link-status
    mtu 1500
    encapsulation dot1q vlan 101
    ip address 10.1.1.3/31

@@ -26,7 +26,13 @@ port_channel_interfaces:
 
   Port-Channel100:
     type: routed
+    logging:
+      event:
+        link_status: true
   Port-Channel100.101:
+    logging:
+      event:
+        link_status: true
     description: IFL for TENANT01
     mtu: 1500
     ip_address: 10.1.1.3/31

@@ -256,6 +256,8 @@ No VLANs defined
 
 *Inherited from Port-Channel Interface
 
+
+
 ### Ethernet Interfaces Device Configuration
 
 ```eos
