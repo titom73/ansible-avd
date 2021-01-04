@@ -49,6 +49,7 @@
     - [Port-Channel Interfaces](#port-channel-interfaces)
     - [Ethernet Interfaces](#ethernet-interfaces)
     - [Loopback Interfaces](#loopback-interfaces)
+    - [Interface Defaults](#interface-defaults)
     - [Management Interfaces](#management-interfaces)
     - [VLAN Interfaces](#vlan-interfaces)
     - [VxLAN Interface](#vxlan-interface)
@@ -88,6 +89,7 @@
     - [Management Security](#management-security)
     - [Management SSH](#management-ssh)
     - [PTP](#ptp)
+    - [Traffic Policies](#traffic-policies)
     - [Custom Templates](#custom-templates)
   - [License](#license)
 
@@ -1625,6 +1627,46 @@ ptp:
     event:
       dscp: < dscp-Value >
 ```
+
+### Traffic Policies
+
+```yaml
+traffic_policies:
+  ipv4:
+    < TRAFFIC POLICY NAME >:
+      matchs:
+        < TRAFFIC POLICY ITEM >:
+          source:
+            prefixes:
+              - < prefix 01 >
+              - < prefix 02 >
+            prefix_lists:
+              - < Prefix List 01 >
+              - < Prefix List 02 >
+          protocols:
+            tcp:
+              src_port: "< vlan range >"
+              dst_port: "< vlan range >"
+            icmp:
+            udp:
+              src_port: "< vlan range >"
+              dst_port: "< vlan range >"
+            ahp:
+            bgp:
+            icmp:
+            igmp:
+            ospf:
+            pim:
+            rsvp:
+            vrrp:
+          actions:
+            dscp: < dscp code value >
+            traffic_class: < traffic class id >
+            count: < counter name >
+            drop: < true | false (default false) >
+            log: < true | false (default false) >
+```
+
 ### Custom Templates
 
 ```yaml
