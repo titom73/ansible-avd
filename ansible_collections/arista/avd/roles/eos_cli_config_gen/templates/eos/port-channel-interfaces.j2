@@ -124,6 +124,30 @@ interface {{ port_channel_interface }}
    pim ipv4 sparse-mode
 {%            endif %}
 {%         endif %}
+{%             if port_channel_interfaces[port_channel_interface].ospf_network_point_to_point is defined and port_channel_interfaces[port_channel_interface].ospf_network_point_to_point == true %}
+   ip ospf network point-to-point
+{%             endif %}
+{%             if port_channel_interfaces[port_channel_interface].ospf_area is defined and port_channel_interfaces[port_channel_interface].ospf_area is not none %}
+   ip ospf area {{ port_channel_interfaces[port_channel_interface].ospf_area }}
+{%             endif %}
+{%             if port_channel_interfaces[port_channel_interface].ospf_cost is defined and port_channel_interfaces[port_channel_interface].ospf_cost is not none %}
+   ip ospf cost {{ port_channel_interfaces[port_channel_interface].ospf_cost }}
+{%             endif %}
+{%             if port_channel_interfaces[port_channel_interface].ospf_authentication is defined and port_channel_interfaces[port_channel_interface].ospf_authentication is not none %}
+{%                 if port_channel_interfaces[port_channel_interface].ospf_authentication == "simple" %}
+   ip ospf authentication
+{%                 elif port_channel_interfaces[port_channel_interface].ospf_authentication == "message-digest" %}
+   ip ospf authentication message-digest
+{%                 endif %}
+{%             endif %}
+{%             if port_channel_interfaces[port_channel_interface].ospf_authentication_key is defined and port_channel_interfaces[port_channel_interface].ospf_authentication_key is not none %}
+   ip ospf authentication-key 7 {{ port_channel_interfaces[port_channel_interface].ospf_authentication_key }}
+{%             endif %}
+{%             if port_channel_interfaces[port_channel_interface].ospf_message_digest_keys is defined and port_channel_interfaces[port_channel_interface].ospf_message_digest_keys is not none %}
+{%               for ospf_message_digest_key in port_channel_interfaces[port_channel_interface].ospf_message_digest_keys | arista.avd.natural_sort %}
+   ip ospf message-digest-key {{ ospf_message_digest_key }} {{ port_channel_interfaces[port_channel_interface].ospf_message_digest_keys[ospf_message_digest_key].hash_algorithm }} 7 {{ port_channel_interfaces[port_channel_interface].ospf_message_digest_keys[ospf_message_digest_key].key }}
+{%               endfor %}
+{%             endif %}
 {%         if port_channel_interfaces[port_channel_interface].vmtracer is defined and port_channel_interfaces[port_channel_interface].vmtracer == true %}
    vmtracer vmware-esx
 {%         endif %}
