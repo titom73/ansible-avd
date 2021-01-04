@@ -71,6 +71,7 @@
 - [Router L2 VPN](#router-l2-vpn)
 - [IP DHCP Relay](#ip-dhcp-relay)
 - [Errdisable](#errdisable)
+- [Traffic Policies](#traffic-policies)
 - [MAC security](#mac-security)
 
 # Management
@@ -442,6 +443,11 @@ errdisable recovery cause xcvr-power-unsupported
 errdisable recovery cause xcvr-unsupported
 errdisable recovery interval 300
 ```
+
+# Traffic Policies
+
+Traffic Policies not defined
+
 # MACsec
 
 MACsec not defined

@@ -1,4 +1,4 @@
-# vlans
+# traffic-policies
 
 # Table of Contents
 
@@ -35,6 +35,7 @@
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
 - [VLANs](#vlans)
 - [Interfaces](#interfaces)
+  - [Interface Defaults](#internet-defaults)
   - [Ethernet Interfaces](#ethernet-interfaces)
   - [Port-Channel Interfaces](#port-channel-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
@@ -222,39 +223,21 @@ Spanning-tree not defined
 
 ## Internal VLAN Allocation Policy Summary
 
+**Default Allocation Policy**
+
 | Policy Allocation | Range Beginning | Range Ending |
 | ------------------| --------------- | ------------ |
-| ascending | 1006 | 1199 |
-
-## Internal VLAN Allocation Policy Configuration
-
-```eos
-!
-vlan internal order ascending range 1006 1199
-```
+| ascending | 1006 | 4094 |
 
 # VLANs
 
-## VLANs Summary
-
-| VLAN ID | Name | Trunk Groups |
-| ------- | ---- | ------------ |
-| 110 | PR01-DMZ | none  |
-| 3010 | MLAG_iBGP_TENANT_A_PROJECT01 | LEAF_PEER_L3  |
-
-## VLANs Device Configuration
-
-```eos
-!
-vlan 110
-   name PR01-DMZ
-!
-vlan 3010
-   name MLAG_iBGP_TENANT_A_PROJECT01
-   trunk group LEAF_PEER_L3
-```
+No VLANs defined
 
 # Interfaces
+
+## Interface Defaults
+
+No Interface Defaults defined
 
 ## Ethernet Interfaces
 
@@ -416,7 +399,84 @@ Errdisable is not defined.
 
 # Traffic Policies
 
-Traffic Policies not defined
+### Policies information
+
+**BLUE-C1-POLICY:**
+
+| Match set | Source prefixes | Ports | Action |
+| --------- | --------------- | ----- | ------ |
+| BLUE-C1-POLICY-01 | 10.0.0.0/8<br/> 192.168.0.0/16<br/>    | tcp<br/>icmp<br/>  | traffic-class: 5<br/> action: pass|
+| BLUE-C1-POLICY-02 | PL-BOGONS01<br/>PL-BOGONS02<br/>   | tcp<br/>icmp<br/>  | counter: BOGONS-TRAFFIC<br/>dscp code: 60<br/> action: pass|
+| BLUE-C1-POLICY-03 | PL-BOGONS<br/>   | tcp<br/>  | logging: enabled<br/> action: drop<br/>|
+
+**BLUE-C2-POLICY:**
+
+| Match set | Source prefixes | Ports | Action |
+| --------- | --------------- | ----- | ------ |
+| BLUE-C1-POLICY-01 | 10.0.0.0/8<br/> 192.168.0.0/16<br/>    | tcp<br/>icmp<br/>  | traffic-class: 5<br/> action: pass|
+| BLUE-C1-POLICY-02 | PL-BOGONS01<br/>PL-BOGONS02<br/>   | tcp<br/>icmp<br/>  | counter: BOGONS-TRAFFIC<br/>dscp code: 60<br/> action: pass|
+| BLUE-C1-POLICY-03 | PL-BOGONS<br/>   | tcp<br/>  | logging: enabled<br/> action: drop<br/>|
+
+### Traffic Policies Device Configuration
+
+```eos
+!
+traffic-policies
+   traffic-policy BLUE-C1-POLICY
+      match BLUE-C1-POLICY-01 ipv4
+         source prefix 10.0.0.0/8 192.168.0.0/16
+         protocol tcp source port 1,10-20
+         protocol icmp
+         actions
+            set traffic class 5
+         !
+      !
+      match BLUE-C1-POLICY-02 ipv4
+         source prefix field-set PL-BOGONS01 PL-BOGONS02
+         protocol tcp destination port 80,443
+         protocol icmp
+         actions
+            count BOGONS-TRAFFIC
+            set dscp 60
+         !
+      !
+      match BLUE-C1-POLICY-03 ipv4
+         source prefix field-set PL-BOGONS
+         protocol tcp
+         actions
+            drop
+            log
+         !
+      !
+   !
+   traffic-policy BLUE-C2-POLICY
+      match BLUE-C1-POLICY-01 ipv4
+         source prefix 10.0.0.0/8 192.168.0.0/16
+         protocol tcp source port 1,10-20
+         protocol icmp
+         actions
+            set traffic class 5
+         !
+      !
+      match BLUE-C1-POLICY-02 ipv4
+         source prefix field-set PL-BOGONS01 PL-BOGONS02
+         protocol tcp destination port 80,443
+         protocol icmp
+         actions
+            count BOGONS-TRAFFIC
+            set dscp 60
+         !
+      !
+      match BLUE-C1-POLICY-03 ipv4
+         source prefix field-set PL-BOGONS
+         protocol tcp
+         actions
+            drop
+            log
+         !
+      !
+   !
+```
 
 # MACsec
 
