@@ -88,6 +88,8 @@
     - [Management Console](#management-console)
     - [Management Security](#management-security)
     - [Management SSH](#management-ssh)
+    - [QOS](#qos)
+    - [QOS Profiles](#qos-profiles)
     - [PTP](#ptp)
     - [Traffic Policies](#traffic-policies)
     - [Custom Templates](#custom-templates)
@@ -1659,6 +1661,7 @@ traffic_policies:
             prefix_lists:
               - < Field Set List 01 >
               - < Field Set List 02 >
+          ttl: "< ttl range>"
           protocols:
             tcp:
               src_port: "< vlan range >"
