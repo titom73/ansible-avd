@@ -1,7 +1,7 @@
 name: chat-pull-request
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, closed]
 jobs:
   chat:
     runs-on: ubuntu-latest
