@@ -1,4 +1,4 @@
-# router-ospf
+# class_maps
 
 # Table of Contents
 
@@ -31,7 +31,6 @@
   - [Hardware Counters](#hardware-counters)
   - [VM Tracer Sessions](#vm-tracer-sessions)
   - [Event Handler](#event-handler)
-- [Hardware TCAM Profile](#hardware-tcam-profile)
 - [MLAG](#mlag)
 - [Spanning Tree](#spanning-tree)
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
@@ -75,7 +74,6 @@
 - [Router L2 VPN](#router-l2-vpn)
 - [IP DHCP Relay](#ip-dhcp-relay)
 - [Errdisable](#errdisable)
-- [Traffic Policies](#traffic-policies)
 - [MAC security](#mac-security)
 - [QOS](#qos)
 - [QOS Profiles](#qos-profiles)
@@ -221,10 +219,6 @@ No VM tracer sessions defined
 
 No event handler defined
 
-# Hardware TCAM Profile
-
-Hardware TCAM profile is not defined
-
 # MLAG
 
 MLAG not defined
@@ -286,7 +280,6 @@ IP virtual router MAC address not defined
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | false|
-
 ### IP Routing Device Configuration
 
 ```eos
@@ -314,29 +307,7 @@ Global ARP timeout not defined.
 
 ## Router OSPF
 
-### Router OSPF Summary
-
-| Process ID | Router ID | Default Passive Interface | No Passive Interface | BFD | Max LSA | Default Information Originate | Log Adjacency Changes Detail |
-| ---------- | --------- | ------------------------- | -------------------- | --- | ------- | ----------------------------- | ---------------------------- |
-| 100 | 192.168.255.3 |  enabled   |   Ethernet1 <br> Ethernet2 <br> Vlan4093 <br>|   enabled   | 12000 |  disabled  |  disabled |
-
-### Router OSPF Router Redistribution
-
-No redsitribution configured
-
-### Router OSPF Device Configuration
-
-```eos
-!
-router ospf 100
-   router-id 192.168.255.3
-   passive-interface default
-   no passive-interface Ethernet1
-   no passive-interface Ethernet2
-   no passive-interface Vlan4093
-   bfd default
-   max-lsa 12000
-```
+Router OSPF not defined
 
 ## Router ISIS
 
@@ -438,10 +409,6 @@ IP DHCP relay not defined
 
 Errdisable is not defined.
 
-# Traffic Policies
-
-Traffic Policies not defined
-
 # MACsec
 
 MACsec not defined
@@ -460,7 +427,27 @@ No custom templates defined
 
 # Class Maps
 
-Class-maps not defined
+## QOS Class Maps
+
+| Name | Field | Value |
+| ---- | ----- | ----- |
+| CM_REPLICATION_LD | acl | ACL_REPLICATION_LD |
+| CM_REPLICATION_LD2 | vlan | 200 |
+| CM_REPLICATION_LD3 | cos | 3 |
+
+## Class-maps Device Configuration
+
+```eos
+!
+class-map type qos match-any CM_REPLICATION_LD
+   match ip access-group ACL_REPLICATION_LD
+!
+class-map type qos match-any CM_REPLICATION_LD2
+   match vlan 200
+!
+class-map type qos match-any CM_REPLICATION_LD3
+   match cos 3
+```
 
 # Policy Maps
 

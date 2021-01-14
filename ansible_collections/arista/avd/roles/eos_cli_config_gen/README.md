@@ -91,6 +91,7 @@
     - [Management SSH](#management-ssh)
     - [QOS](#qos)
     - [QOS Profiles](#qos-profiles)
+    - [Class-maps](#class-maps)
     - [PTP](#ptp)
     - [Traffic Policies](#traffic-policies)
     - [Custom Templates](#custom-templates)
@@ -1768,6 +1769,18 @@ qos_profiles:
       < tx-queue-id >:
         bandwidth_percent: < value >
         priority: < string >
+```
+
+### Class-maps
+
+```yaml
+class_maps:
+  qos:
+    < class-map name >:
+      vlan: < VLAN value(s) or range(s) of VLAN values >
+      cos: < CoS value(s) or range(s) of CoS values >
+      ip:
+        access_group: < Standard access-list name >
 ```
 ### PTP
 
