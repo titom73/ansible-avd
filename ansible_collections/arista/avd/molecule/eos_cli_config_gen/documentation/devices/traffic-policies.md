@@ -30,12 +30,12 @@
   - [Hardware Counters](#hardware-counters)
   - [VM Tracer Sessions](#vm-tracer-sessions)
   - [Event Handler](#event-handler)
+- [Hardware TCAM Profile](#hardware-tcam-profile)
 - [MLAG](#mlag)
 - [Spanning Tree](#spanning-tree)
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
 - [VLANs](#vlans)
 - [Interfaces](#interfaces)
-  - [Interface Defaults](#internet-defaults)
   - [Ethernet Interfaces](#ethernet-interfaces)
   - [Port-Channel Interfaces](#port-channel-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
@@ -211,6 +211,10 @@ No VM tracer sessions defined
 
 No event handler defined
 
+# Hardware TCAM Profile
+
+Hardware TCAM profile is not defined
+
 # MLAG
 
 MLAG not defined
@@ -234,10 +238,6 @@ Spanning-tree not defined
 No VLANs defined
 
 # Interfaces
-
-## Interface Defaults
-
-No Interface Defaults defined
 
 ## Ethernet Interfaces
 
@@ -404,7 +404,9 @@ Errdisable is not defined.
 
 | Field Set Name | Values |
 | -------------- | ------ |
-| DEMO-01 | 10.0.0.0/8<br/>192.168.0.0/16| | DEMO-02 | 172.16.0.0/12<br/>224.0.0.0/8| 
+| DEMO-01 | 10.0.0.0/8<br/>192.168.0.0/16|
+| DEMO-02 | 172.16.0.0/12<br/>224.0.0.0/8|
+
 **IPv6 Field sets**
 
 No IPv6 field-set configured.
@@ -413,24 +415,25 @@ No IPv6 field-set configured.
 
 | Field Set Name | Values |
 | -------------- | ------ |
-| SERVICE-DEMO | 10,20,80,440-450 | 
+| SERVICE-DEMO | 10,20,80,440-450|
+
 #### Traffic Policies
 **BLUE-C1-POLICY:**
 
-| Match set | Type | Sources | Destinations | Protocol | Action |
-| --------- | ---- | ------- | ------------ | -------- | ------ |
- | BLUE-C1-POLICY-01 | ipv4 | 10.0.0.0/8<br/>192.168.0.0/16  | DEMO-01 |  tcp  (src: 1,10-20 )<br/> icmp <br/>|  traffic-class: 5<br/> action: pass |
- | BLUE-C1-POLICY-02 | ipv4 | DEMO-01<br/>DEMO-02  |  |  tcp  (dst: SERVICE-DEMO / flags: established)<br/> icmp <br/>|  counter: DEMO-TRAFFIC<br/>dscp code: 60<br/> action: pass |
- | BLUE-C1-POLICY-03 | ipv4 | DEMO-01  |  |  tcp <br/>|  counter: DROP-PACKETS<br/>logging: enabled<br/> action: drop<br/> |
- | BLUE-C1-POLICY-04 | ipv4 | DEMO-02  | DEMO-01 |  tcp  (src: 22 / flags: established)<br/> icmp <br/>|  traffic-class: 5<br/> action: pass |
+| Match set | Type | Sources | Destinations | Protocol | Source Port(s) | Destination port(s) | Action |
+| --------- | ---- | ------- | ------------ | -------- | -------------- | ------------------- | ------ |
+| BLUE-C1-POLICY-01 | ipv4 | 10.0.0.0/8<br/>192.168.0.0/16 | DEMO-01 | tcp<br/>icmp | 1,10-20 | ANY | action: PASS<br/>traffic-class: 5 |
+| BLUE-C1-POLICY-02 | ipv4 | DEMO-01<br/>DEMO-02 | ANY | tcp<br/>icmp | ANY | SERVICE-DEMO | action: PASS<br/>counter: DEMO-TRAFFIC<br/>dscp marking: 60 |
+| BLUE-C1-POLICY-03 | ipv4 | DEMO-01 | ANY | tcp | ANY | ANY | action: DROP<br/>counter: DROP-PACKETS<br/>logging |
+| BLUE-C1-POLICY-04 | ipv4 | DEMO-02 | DEMO-01 | tcp<br/>icmp | 22 | ANY | action: PASS<br/>traffic-class: 5 |
 
 **BLUE-C2-POLICY:**
 
-| Match set | Type | Sources | Destinations | Protocol | Action |
-| --------- | ---- | ------- | ------------ | -------- | ------ |
- | BLUE-C2-POLICY-01 | ipv4 | 10.0.0.0/8<br/>192.168.0.0/16  |  |  tcp  (src: 1,10-20 )<br/> icmp <br/>|  traffic-class: 5<br/> action: pass |
- | BLUE-C2-POLICY-02 | ipv4 | DEMO-01<br/>DEMO-02  |  |  tcp  (dst: SERVICE-DEMO )<br/> icmp <br/>|  counter: DEMO-TRAFFIC<br/>dscp code: 60<br/> action: pass |
- | BLUE-C2-POLICY-03 | ipv4 | DEMO-01  |  |  tcp <br/>|  logging: enabled<br/> action: drop<br/> |
+| Match set | Type | Sources | Destinations | Protocol | Source Port(s) | Destination port(s) | Action |
+| --------- | ---- | ------- | ------------ | -------- | -------------- | ------------------- | ------ |
+| BLUE-C2-POLICY-01 | ipv4 | 10.0.0.0/8<br/>192.168.0.0/16 | ANY | tcp<br/>icmp | 1,10-20 | ANY | action: PASS<br/>traffic-class: 5 |
+| BLUE-C2-POLICY-02 | ipv4 | DEMO-01<br/>DEMO-02 | ANY | tcp<br/>icmp | SERVICE-DEMO | ANY | action: PASS<br/>counter: DEMO-TRAFFIC<br/>dscp marking: 60 |
+| BLUE-C2-POLICY-03 | ipv4 | DEMO-01 | ANY | tcp | ANY | ANY | action: DROP<br/>logging |
 
 ### Traffic Policies Device Configuration
 
@@ -451,7 +454,7 @@ traffic-policies
       match BLUE-C1-POLICY-01 ipv4
          source prefix 10.0.0.0/8 192.168.0.0/16
          destination prefix field-set DEMO-01
-         protocol tcp source port 1,10-20
+         protocol tcp
          protocol icmp
          actions
             set traffic class 5
@@ -459,7 +462,7 @@ traffic-policies
       !
       match BLUE-C1-POLICY-02 ipv4
          source prefix field-set DEMO-01 DEMO-02
-         protocol tcp flags established destination port field-set SERVICE-DEMO
+         protocol tcp
          protocol icmp
          actions
             count DEMO-TRAFFIC
@@ -478,7 +481,7 @@ traffic-policies
       match BLUE-C1-POLICY-04 ipv4
          source prefix field-set DEMO-02
          destination prefix field-set DEMO-01
-         protocol tcp flags established source port 22
+         protocol tcp
          protocol icmp
          actions
             set traffic class 5
@@ -489,7 +492,7 @@ traffic-policies
       counter DEMO-TRAFFIC
       match BLUE-C2-POLICY-01 ipv4
          source prefix 10.0.0.0/8 192.168.0.0/16
-         protocol tcp source port 1,10-20
+         protocol tcp
          protocol icmp
          actions
             set traffic class 5
