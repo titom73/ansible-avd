@@ -49,7 +49,6 @@
     - [Port-Channel Interfaces](#port-channel-interfaces)
     - [Ethernet Interfaces](#ethernet-interfaces)
     - [Loopback Interfaces](#loopback-interfaces)
-    - [Interface Defaults](#interface-defaults)
     - [Management Interfaces](#management-interfaces)
     - [VLAN Interfaces](#vlan-interfaces)
     - [VxLAN Interface](#vxlan-interface)
@@ -88,8 +87,6 @@
     - [Management Console](#management-console)
     - [Management Security](#management-security)
     - [Management SSH](#management-ssh)
-    - [QOS](#qos)
-    - [QOS Profiles](#qos-profiles)
     - [PTP](#ptp)
     - [Traffic Policies](#traffic-policies)
     - [Custom Templates](#custom-templates)
@@ -946,7 +943,9 @@ vxlan_tunnel_interface:
 
 ```yaml
 tcam_profile:
-  - < tcam_profile >
+  system: < tcamp profile name to activate >
+  profiles:
+    < tcam_profile 01 >: "{{lookup('file', '< path to TCAM profile using EOS syntax >')}}"
 ```
 
 ### MAC Address-table
