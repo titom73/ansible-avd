@@ -1,4 +1,4 @@
-# router-isis
+# traffic-policies
 
 # Table of Contents
 
@@ -13,7 +13,6 @@
   - [Management API](#Management-api-http)
 - [Authentication](#authentication)
   - [Local Users](#local-users)
-  - [Enable Password](#enable-password)
   - [TACACS Servers](#tacacs-servers)
   - [IP TACACS Source Interfaces](#ip-tacacs-source-interfaces)
   - [RADIUS Servers](#radius-servers)
@@ -31,13 +30,12 @@
   - [Hardware Counters](#hardware-counters)
   - [VM Tracer Sessions](#vm-tracer-sessions)
   - [Event Handler](#event-handler)
-- [Hardware TCAM Profile](#hardware-tcam-profile)
 - [MLAG](#mlag)
 - [Spanning Tree](#spanning-tree)
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
 - [VLANs](#vlans)
 - [Interfaces](#interfaces)
-  - [Interface Defaults](#interface-defaults)
+  - [Interface Defaults](#internet-defaults)
   - [Ethernet Interfaces](#ethernet-interfaces)
   - [Port-Channel Interfaces](#port-channel-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
@@ -49,7 +47,6 @@
   - [IPv6 Routing](#ipv6-routing)
   - [Static Routes](#static-routes)
   - [IPv6 Static Routes](#ipv6-static-routes)
-  - [Router OSPF](#router-ospf)
   - [Router ISIS](#router-isis)
   - [Router BGP](#router-bgp)
   - [Router BFD](#router-bfd)
@@ -90,7 +87,7 @@
 
 | Management Interface | description | VRF | IP Address | Gateway |
 | -------------------- | ----------- | --- | ---------- | ------- |
-| Management1 | oob_management | MGMT | 10.73.254.11/24 | 10.73.254.253 |
+| Management1 | oob_management | MGMT | 10.73.255.122/24 | 10.73.255.2 |
 
 #### IPv6
 
@@ -105,7 +102,7 @@
 interface Management1
    description oob_management
    vrf MGMT
-   ip address 10.73.254.11/24
+   ip address 10.73.255.122/24
 ```
 
 ## DNS Domain
@@ -149,10 +146,6 @@ Management API HTTP not defined
 ## Local Users
 
 No users defined
-
-## Enable Password
-
-Enable password not defined
 
 ## TACACS Servers
 
@@ -220,10 +213,6 @@ No VM tracer sessions defined
 
 No event handler defined
 
-# Hardware TCAM Profile
-
-Hardware TCAM profile is not defined
-
 # MLAG
 
 MLAG not defined
@@ -254,54 +243,7 @@ No Interface Defaults defined
 
 ## Ethernet Interfaces
 
-### Ethernet Interfaces Summary
-
-#### L2
-
-| Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
-| --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet3 | MLAG_PEER_EAPI-LEAF1B_Ethernet3 | *access | *- | *- | *- | 3 |
-
-*Inherited from Port-Channel Interface
-
-#### IPv4
-
-| Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
-| --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
-| Ethernet1 |  P2P_LINK_TO_EAPI-SPINE1_Ethernet1  |  routed  | - |  172.31.255.1/31  |  default  |  1500  |  -  |  -  |  -  |
-| Ethernet2 |  P2P_LINK_TO_EAPI-SPINE2_Ethernet1  |  routed  | - |  172.31.255.3/31  |  default  |  1500  |  -  |  -  |  -  |
-
-#### ISIS
-
-| Interface | Channel Group | ISIS Instance | ISIS Metric | Mode |
-| --------- | ------------- | ------------- | ----------- | ---- |
-| Ethernet1 | - | EVPN_UNDERLAY |  50 |  point-to-point |
-| Ethernet2 | - | EVPN_UNDERLAY |  50 |  point-to-point |
-
-### Ethernet Interfaces Device Configuration
-
-```eos
-!
-interface Ethernet1
-   description P2P_LINK_TO_EAPI-SPINE1_Ethernet1
-   no switchport
-   ip address 172.31.255.1/31
-   isis enable EVPN_UNDERLAY
-   isis metric 50
-   isis network point-to-point
-!
-interface Ethernet2
-   description P2P_LINK_TO_EAPI-SPINE2_Ethernet1
-   no switchport
-   ip address 172.31.255.3/31
-   isis enable EVPN_UNDERLAY
-   isis metric 50
-   isis network point-to-point
-!
-interface Ethernet3
-   description MLAG_PEER_EAPI-LEAF1B_Ethernet3
-   channel-group 3 mode active
-```
+No ethernet interface defined
 
 ## Port-Channel Interfaces
 
@@ -309,94 +251,11 @@ No port-channels defined
 
 ## Loopback Interfaces
 
-### Loopback Interfaces Summary
-
-#### IPv4
-
-| Interface | Description | VRF | IP Address |
-| --------- | ----------- | --- | ---------- |
-| Loopback0 | EVPN_Overlay_Peering | default | 192.168.255.3/32 |
-| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 192.168.254.3/32 |
-
-#### IPv6
-
-| Interface | Description | VRF | IPv6 Address |
-| --------- | ----------- | --- | ------------ |
-| Loopback0 | EVPN_Overlay_Peering | default | - |
-| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
-
-#### ISIS
-
-| Interface | ISIS instance | ISIS metric | Interface mode |
-| -------- | -------- | -------- | -------- |
-| Loopback0 | EVPN_UNDERLAY |  - |  passive |
-| Loopback1 | EVPN_UNDERLAY |  - |  passive |
-
-### Loopback Interfaces Device Configuration
-
-```eos
-!
-interface Loopback0
-   description EVPN_Overlay_Peering
-   ip address 192.168.255.3/32
-   isis enable EVPN_UNDERLAY
-   isis passive
-!
-interface Loopback1
-   description VTEP_VXLAN_Tunnel_Source
-   ip address 192.168.254.3/32
-   isis enable EVPN_UNDERLAY
-   isis passive
-```
+No loopback interfaces defined
 
 ## VLAN Interfaces
 
-### VLAN Interfaces Summary
-
-| Interface | Description | VRF |  MTU | Shutdown |
-| --------- | ----------- | --- | ---- | -------- |
-| Vlan110 |  PR01-DEMO  |  TENANT_A_PROJECT01  |  -  |  false  |
-| Vlan4093 |  MLAG_PEER_L3_PEERING  |  default  |  -  |  -  |
-| Vlan4094 |  MLAG_PEER  |  default  |  1500  |  -  |
-
-#### IPv4
-
-| Interface | VRF | IP Address | IP Address Virtual | IP Router Virtual Address | VRRP | ACL In | ACL Out |
-| --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
-| Vlan110 |  TENANT_A_PROJECT01  |  -  |  10.1.10.254/24  |  -  |  -  |  -  |  -  |
-| Vlan4093 |  default  |  10.255.251.0/31  |  -  |  -  |  -  |  -  |  -  |
-| Vlan4094 |  default  |  10.255.252.0/31  |  -  |  -  |  -  |  -  |  -  |
-
-
-
-#### ISIS
-
-| Interface | ISIS Instance | ISIS Metric | Mode |
-| --------- | ------------- | ----------- | ---- |
-| Vlan4093 | EVPN_UNDERLAY |  50 |  point-to-point |
-
-### VLAN Interfaces Device Configuration
-
-```eos
-!
-interface Vlan110
-   description PR01-DEMO
-   no shutdown
-   vrf TENANT_A_PROJECT01
-   ip address virtual 10.1.10.254/24
-!
-interface Vlan4093
-   description MLAG_PEER_L3_PEERING
-   ip address 10.255.251.0/31
-   isis enable EVPN_UNDERLAY
-   isis metric 50
-   isis network point-to-point
-!
-interface Vlan4094
-   description MLAG_PEER
-   no autostate
-   ip address 10.255.252.0/31
-```
+No VLAN interfaces defined
 
 ## VXLAN Interface
 
@@ -414,8 +273,7 @@ IP virtual router MAC address not defined
 
 | VRF | Routing Enabled |
 | --- | --------------- |
-| default | false|
-
+| default | false| 
 ### IP Routing Device Configuration
 
 ```eos
@@ -441,46 +299,9 @@ IPv6 static routes not defined
 
 Global ARP timeout not defined.
 
-## Router OSPF
-
-Router OSPF not defined
-
 ## Router ISIS
 
-### Router ISIS Summary
-
-| Settings | Value |
-| -------- | ----- |
-| Instance | EVPN_UNDERLAY |
-| Net-ID | 49.0001.0001.0001.0001.00 |
-| Type | level-2 |
-| Address Family | ipv4 unicast |
-
-### ISIS Interfaces Summary
-
-| Interface | ISIS Instance | ISIS Metric | Interface Mode |
-| -------- | -------- | -------- | -------- |
-| Ethernet1 | EVPN_UNDERLAY |  50 |  point-to-point |
-| Ethernet2 | EVPN_UNDERLAY |  50 |  point-to-point |
-| Vlan4093 | EVPN_UNDERLAY |  50 |  point-to-point |
-| Loopback0 | EVPN_UNDERLAY |  - |  passive |
-| Loopback1 | EVPN_UNDERLAY |  - |  passive |
-
-### Router ISIS Device Configuration
-
-```eos
-router isis EVPN_UNDERLAY
-   net 49.0001.0001.0001.0001.00
-   is-type level-2
-   router-id ipv4 192.168.255.3
-   log-adjacency-changes
-   !
-   address-family ipv4 unicast
-      maximum-paths 2
-   !
-!
-```
-
+Router ISIS not defined
 
 ## Router BGP
 
@@ -580,7 +401,136 @@ Errdisable is not defined.
 
 # Traffic Policies
 
-Traffic Policies not defined
+### Traffic Policies information
+**IPv4 Field sets**
+
+| Field Set Name | Values |
+| -------------- | ------ |
+| DEMO-01 | 10.0.0.0/8<br/>192.168.0.0/16| | DEMO-02 | 172.16.0.0/12<br/>224.0.0.0/8| 
+**IPv6 Field sets**
+
+No IPv6 field-set configured.
+
+**L4 Port Field sets**
+
+| Field Set Name | Values |
+| -------------- | ------ |
+| SERVICE-DEMO | 10,20,80,440-450 | 
+#### Traffic Policies
+**BLUE-C1-POLICY:**
+
+| Match set | Type | Sources | Destinations | Protocol | Source Port(s) | Destination port(s) | Action |
+| --------- | ---- | ------- | ------------ | -------- | -------------- | ------------------- | ------ |
+| BLUE-C1-POLICY-01 | ipv4 | 10.0.0.0/8<br/>192.168.0.0/16 | DEMO-01 | tcp | 1,10-20 | ANY | action: PASS<br/>traffic-class: 5 |
+| BLUE-C1-POLICY-02 | ipv4 | DEMO-01<br/>DEMO-02 | ANY | tcp<br/>icmp | ANY | SERVICE-DEMO | action: PASS<br/>counter: DEMO-TRAFFIC<br/>dscp marking: 60 |
+| BLUE-C1-POLICY-03 | ipv4 | DEMO-01 | ANY | icmp | ANY | ANY | action: DROP<br/>counter: DROP-PACKETS<br/>log |
+| BLUE-C1-POLICY-04 | ipv4 | DEMO-02 | DEMO-01 | tcp<br/>icmp | 22 | ANY | action: PASS<br/>traffic-class: 5 |
+| BLUE-C1-POLICY-05 | ipv4 | DEMO-02 | DEMO-01 | tcp | ANY | ANY | action: PASS<br/>traffic-class: 5 |
+
+**BLUE-C2-POLICY:**
+
+| Match set | Type | Sources | Destinations | Protocol | Source Port(s) | Destination port(s) | Action |
+| --------- | ---- | ------- | ------------ | -------- | -------------- | ------------------- | ------ |
+| BLUE-C2-POLICY-01 | ipv4 | 10.0.0.0/8<br/>192.168.0.0/16 | ANY | tcp<br/>icmp | 1,10-20 | ANY | action: PASS<br/>traffic-class: 5 |
+| BLUE-C2-POLICY-02 | ipv4 | DEMO-01<br/>DEMO-02 | ANY | tcp<br/>icmp | SERVICE-DEMO | ANY | action: PASS<br/>counter: DEMO-TRAFFIC<br/>dscp marking: 60 |
+| BLUE-C2-POLICY-03 | ipv4 | DEMO-01 | ANY | tcp | ANY | ANY | action: DROP<br/>log |
+
+### Traffic Policies Device Configuration
+
+```eos
+!
+traffic-policies
+   field-set ipv4 prefix DEMO-01
+      10.0.0.0/8 192.168.0.0/16
+   !
+   field-set ipv4 prefix DEMO-02
+      172.16.0.0/12 224.0.0.0/8
+   !
+   field-set l4-port SERVICE-DEMO
+      10,20,80,440-450
+   !
+   traffic-policy BLUE-C1-POLICY
+      counter DEMO-TRAFFIC DROP-PACKETS
+      match BLUE-C1-POLICY-01 ipv4
+         source prefix 10.0.0.0/8 192.168.0.0/16
+         destination prefix field-set DEMO-01
+         protocol tcp
+         ttl 10, 20-30
+         actions
+            set traffic class 5
+         !
+      !
+      match BLUE-C1-POLICY-02 ipv4
+         source prefix field-set DEMO-01 DEMO-02
+         protocol tcp
+         protocol icmp
+         actions
+            count DEMO-TRAFFIC
+            set dscp 60
+         !
+      !
+      match BLUE-C1-POLICY-03 ipv4
+         source prefix field-set DEMO-01
+         protocol icmp
+         fragment offset 1124, 2000-2010
+         actions
+            count DROP-PACKETS
+            drop
+            log
+         !
+      !
+      match BLUE-C1-POLICY-04 ipv4
+         source prefix field-set DEMO-02
+         destination prefix field-set DEMO-01
+         protocol tcp
+         protocol icmp
+         actions
+            set traffic class 5
+         !
+      !
+      match BLUE-C1-POLICY-05 ipv4
+         source prefix field-set DEMO-02
+         destination prefix field-set DEMO-01
+         protocol tcp
+         fragment
+         actions
+            set traffic class 5
+         !
+      !
+   !
+   traffic-policy BLUE-C2-POLICY
+      counter DEMO-TRAFFIC
+      match BLUE-C2-POLICY-01 ipv4
+         source prefix 10.0.0.0/8 192.168.0.0/16
+         protocol tcp
+         protocol icmp
+         actions
+            set traffic class 5
+         !
+      !
+      match BLUE-C2-POLICY-02 ipv4
+         source prefix field-set DEMO-01 DEMO-02
+         protocol tcp source port field-set SERVICE-DEMO
+         protocol icmp
+         actions
+            count DEMO-TRAFFIC
+            set dscp 60
+         !
+      !
+      match BLUE-C2-POLICY-03 ipv4
+         source prefix field-set DEMO-01
+         protocol tcp
+         actions
+            drop
+            log
+         !
+      !
+      match ipv4-all-default ipv4
+         actions
+            drop
+            log
+   !
+```
 
 # MACsec
 

@@ -43,6 +43,7 @@ tcam
 terminattr-cloud
 terminattr-prem
 terminattr-prem-disableaaa
+traffic-policies
 vlan-interfaces
 vlans
 vrfs
