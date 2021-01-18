@@ -500,12 +500,15 @@ router_bgp:
 {% include 'fabric/bgp_base/leaf-router-bgp-peer-groups.j2' %}
   neighbors:
 {% include 'fabric/bgp_base/leaf-router-bgp-neighbors.j2' %}
+{% include 'fabric/bgp_base/switch-router-bgp-neighbors-overlay-controllers.j2' %}
   redistribute_routes:
 {% include 'fabric/ebgp_underlay/leaf-router-bgp-redistribute-routes.j2' %}
   address_family_evpn:
 {% include 'fabric/bgp_overlay/leaf-router-bgp-address-family-evpn.j2' %}
   address_family_ipv4:
 {% include 'fabric/ebgp_underlay/leaf-router-bgp-address-family-ipv4.j2' %}
+  address_family_rtc:
+{% include 'fabric/bgp_overlay/switch-router-bgp-address-family-rtc.j2' %}
 {# Tenant router bgp evpn #}
   vlan_aware_bundles:
 {% include 'tenant_evpn_vxlan/leaf-tenant-router-bgp-evpn-vlan-aware-bundles.j2' %}
