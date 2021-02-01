@@ -1,4 +1,4 @@
-# terminattr-cloud
+# router-general
 
 # Table of Contents
 
@@ -31,7 +31,6 @@
   - [Hardware Counters](#hardware-counters)
   - [VM Tracer Sessions](#vm-tracer-sessions)
   - [Event Handler](#event-handler)
-- [Hardware TCAM Profile](#hardware-tcam-profile)
 - [MLAG](#mlag)
 - [Spanning Tree](#spanning-tree)
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
@@ -76,11 +75,9 @@
 - [Router L2 VPN](#router-l2-vpn)
 - [IP DHCP Relay](#ip-dhcp-relay)
 - [Errdisable](#errdisable)
-- [Traffic Policies](#traffic-policies)
 - [MAC security](#mac-security)
 - [QOS](#qos)
 - [QOS Profiles](#qos-profiles)
-- [Class Maps](#class-maps)
 
 # Management
 
@@ -196,20 +193,7 @@ Aliases not defined
 
 ## TerminAttr Daemon
 
-### TerminAttr Daemon Summary
-
-| CV Compression | Ingest gRPC URL | Ingest Authentication Key | Smash Excludes | Ingest Exclude | Ingest VRF |  NTP VRF | AAA Disabled |
-| -------------- | --------------- | ------------------------- | -------------- | -------------- | ---------- | -------- | ------ |
-| gzip | apiserver.corp.arista.io:9910 | magickey | ale,flexCounter,hardware,kni,pulse,strata | /Sysdb/cell/1/agent,/Sysdb/cell/2/agent | mgt | mgt | False |
-
-### TerminAttr Daemon Device Configuration
-
-```eos
-!
-daemon TerminAttr
-   exec /usr/bin/TerminAttr -cvaddr=apiserver.corp.arista.io:443 -cvcompression=gzip -taillogs -cvauth=token-secure,/tmp/cv-onboarding-token -smashexcludes=ale,flexCounter,hardware,kni,pulse,strata -ingestexclude=/Sysdb/cell/1/agent,/Sysdb/cell/2/agent  -cvvrf=mgt
-   no shutdown
-```
+TerminAttr daemon not defined
 
 ## Logging
 
@@ -234,10 +218,6 @@ No VM tracer sessions defined
 ## Event Handler
 
 No event handler defined
-
-# Hardware TCAM Profile
-
-Hardware TCAM profile is not defined
 
 # MLAG
 
@@ -300,7 +280,6 @@ IP virtual router MAC address not defined
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | false|
-
 ### IP Routing Device Configuration
 
 ```eos
@@ -328,7 +307,21 @@ Global ARP timeout not defined.
 
 ## Router General
 
-Router general not defined
+### VRF Route leaking
+
+| VRF | Source VRF | Route Map Policy |
+|-----|------------|------------------|
+| BLUE-C2 | BLUE-C1 | RM-BLUE-LEAKING |
+
+### Router General configuration
+
+```eos
+!
+router general
+   vrf BLUE-C2
+      leak routes source-vrf BLUE-C1 subscribe-policy RM-BLUE-LEAKING
+   !
+```
 
 ## Router OSPF
 
@@ -434,10 +427,6 @@ IP DHCP relay not defined
 
 Errdisable is not defined.
 
-# Traffic Policies
-
-Traffic Policies not defined
-
 # MACsec
 
 MACsec not defined
@@ -453,11 +442,3 @@ QOS Profiles are not defined
 # Custom Templates
 
 No custom templates defined
-
-# Class Maps
-
-Class-maps not defined
-
-# Policy Maps
-
-Class-maps not defined
