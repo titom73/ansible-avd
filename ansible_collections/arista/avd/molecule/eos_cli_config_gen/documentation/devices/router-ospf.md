@@ -311,10 +311,18 @@ Global ARP timeout not defined.
 | Process ID | Router ID | Default Passive Interface | No Passive Interface | BFD | Max LSA | Default Information Originate | Log Adjacency Changes Detail |
 | ---------- | --------- | ------------------------- | -------------------- | --- | ------- | ----------------------------- | ---------------------------- |
 | 100 | 192.168.255.3 |  enabled   |   Ethernet1 <br> Ethernet2 <br> Vlan4093 <br>|   enabled   | 12000 |  disabled  |  disabled |
+| 101 | 1.0.1.1 |  enabled   |   Ethernet2.101 <br>|   disabled   | default |  disabled  |   enabled |
 
 ### Router OSPF Router Redistribution
 
 No redsitribution configured
+### Router OSPF route summary
+| Process ID | Prefix | Tag | Attribute Route Map | Not Advertised |
+|------------|--------|-----|---------------------|----------------|
+| 101 | 10.0.0.0/8 | - | - | - |
+| 101 | 20.0.0.0/8 | 10 | - | - |
+| 101 | 30.0.0.0/8 | - | RM-OSPF_SUMMARY | - |
+| 101 | 40.0.0.0/8 | - | - | True |
 
 ### Router OSPF Device Configuration
 
@@ -328,6 +336,16 @@ router ospf 100
    no passive-interface Vlan4093
    bfd default
    max-lsa 12000
+!
+router ospf 101 vrf CUSTOMER01
+   log-adjacency-changes detail
+   router-id 1.0.1.1
+   passive-interface default
+   no passive-interface Ethernet2.101
+   summary 10.0.0.0/8
+   summary 20.0.0.0/8 tag 10
+   summary 30.0.0.0/8 attribute-map RM-OSPF_SUMMARY
+   summary 40.0.0.0/8 not-advertise
 ```
 
 ## Router ISIS

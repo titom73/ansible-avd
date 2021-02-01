@@ -10,3 +10,19 @@ router_ospf:
         - Vlan4093
       bfd_enable: true
       max_lsa: 12000
+    101:
+      vrf: CUSTOMER01
+      passive_interface_default: true
+      router_id: 1.0.1.1
+      log_adjacency_changes_detail: true
+      bfd_enable: false
+      no_passive_interfaces:
+        - Ethernet2.101
+      summary:
+        - prefix: 10.0.0.0/8
+        - prefix: 20.0.0.0/8
+          tag: 10
+        - prefix: 30.0.0.0/8
+          attribute_map: RM-OSPF_SUMMARY
+        - prefix: 40.0.0.0/8
+          not_advertise: true
