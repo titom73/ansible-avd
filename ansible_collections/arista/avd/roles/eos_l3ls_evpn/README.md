@@ -262,9 +262,18 @@ mac_address_table:
 **Variables and Options:**
 
 ```yaml
-
-# Fabric Name, required to match group_var file name | Required.
+# The topology hierarchy is
+# Fabric
+# - DC
+#   - POD
+#
+# Fabric Name, required to match Ansible Group name covering all devices in the Fabric | Required.
 fabric_name: < Fabric_Name >
+# DC Name, required to match Ansible Group name convering all devices in the DC | Required for 5-stage CLOS (Super-spines)
+dc_name: < DC_Name >
+# POD Name, only used in Fabric Documentation | Optional, fallback to dc_name and then to fabric_name
+# Recommended be common between Spines, Leafs within a POD (One l3ls topology)
+pod_name: < POD_Name >
 
 # Underlay routing protocol | Required.
 underlay_routing_protocol: < EBGP or OSPF or ISIS | Default -> EBGP >
@@ -380,6 +389,10 @@ l2leaf_inband_management_vlan: < vlan_id >
 
 # QOS Profile assigned on all infrastructure links | Optional
 p2p_uplinks_qos_profile: < qos_profile_name >
+
+# Enable PTP on all infrastructure links | Optional
+p2p_uplinks_ptp:
+  enable: < boolean | default -> false >
 ```
 
 **Example:**
@@ -1019,6 +1032,40 @@ tenants:
             enabled: < true | false >
             ip_address_virtual: < IPv4_address/Mask >
 
+        # Dictionary of static routes | Optional.
+        # This will create static routes inside the tenant VRF, if none specified, all l3leafs that carry the VRF also get the static routes.
+        # If a node has a static route in the VRF, redistribute static will be automatically enabled in that VRF. This automatic behaviour can be
+        # overridden non-selectively with the redistribute_static knob for the VRF.
+        static_routes:
+          - destination_address_prefix: < IPv4_address/Mask >
+            gateway: < IPv4_address >
+            nodes: [ < node_1 >, < node_2 >]
+
+        # Non-selectively enabling or disabling redistribute static inside the VRF | Optional.
+        redistribute_static: < true | false >
+
+        # Dictionary of BGP peer definitions | Optional.
+        # This will configure BGP neighbors inside the tenant VRF for peering with external devices.
+        bgp_peers:
+          < IPv4_address or IPv6_address >:
+            remote_as: < remote ASN >
+            description: < description >
+            send_community: < standard | extended | large | empty >
+            next_hop_self: < true | false >
+            maximum_routes: < 0-4294967294 >
+            default_originate:
+              always: < true | false >
+            update_source: < interface >
+            ebgp_multihop: < 1-255 >
+            address_family:
+              - < ipv4 | ipv6 >
+            # Nodes is required to restrict configuration of BGP neighbors to certain nodes in the network.
+            nodes: [ < node_1 >, < node_2> ]
+            # Next hop settings can be either ipv4 or ipv6 for one neighbor, this will be applied by a uniquely generated route-map per neighbor.
+            set_ipv4_next_hop: < IPv4_address >
+            set_ipv6_next_hop: < IPv6_address >
+            local_as: < local BGP ASN >
+
       < tenant_a_vrf_2 >:
         vrf_vni: < 1-1024 >
         svis:
@@ -1237,6 +1284,8 @@ port_profiles:
     flowcontrol:
       received: < received | send | on >
     qos_profile: < qos_profile_name >
+    ptp:
+      enable: < true | false >
     storm_control:
       all:
         level: < Configure maximum storm-control level >
@@ -1302,6 +1351,10 @@ servers:
 
         # QOS Profile | Optional
         qos_profile: < qos_profile_name >
+
+        # PTP Enable | Optional
+        ptp:
+          enable: < true | false >
 
       < port_profile_2 >:
         mode: < access | dot1q-tunnel | trunk >
@@ -1875,25 +1928,53 @@ Lists are replaced. Dictionaries are updated. The combine is done recursively, s
 ```yaml
 custom_structured_configuration_name_server:
   nodes:
-    - 1.2.3.4
+    - 10.2.3.4
 custom_structured_configuration_ethernet_interfaces:
   Ethernet4000:
     description: My test
-    ip_address: 1.2.3.4/12
+    ip_address: 10.1.2.3/12
+    shutdown: false
+    type: routed
     mtu: 1500
     peer: MY-own-peer
     peer_interface: Ethernet123
     peer_type: my_precious
 ```
-In this example the contents of the `name_server.nodes` variable in the Structured Configuration will be replaced by the list `[ "1.2.3.4" ]`
+In this example the contents of the `name_server.nodes` variable in the Structured Configuration will be replaced by the list `[ "10.2.3.4" ]`
 and `Ethernet4000` will be added to the `ethernet_interfaces` dictionary in the Structured Configuration.
 
 `custom_structured_configuration_prefix` allows the user to customize the prefix for Custom Structured Configuration variables.
-Default value is `custom_structured_configuration_`.
+Default value is `custom_structured_configuration_`. Remember to include any delimiter like the last `_` in this case.
+It is possible to specify a list of prefixes, which will all be merged one by one. The order of merge will start from beginning of the list, which means that keys defined in the later prefixes will be able to override keys defined in previous ones.
 
 ```yaml
 custom_structured_configuration_prefix: < variable_prefix, default -> "custom_structured_configuration_" >
+#or
+custom_structured_configuration_prefix: [ < variable_prefix_1 > , < variable_prefix_2 > , < variable_prefix_3 > ]
 ```
+
+Example using multiple prefixes:
+
+```yaml
+custom_structured_configuration_prefix: [ my_dci_ , my_special_dci_ ]
+
+my_dci_ethernet_interfaces:
+  Ethernet4000:
+    description: My test
+    ip_address: 10.1.2.3/12
+    shutdown: false
+    type: routed
+    mtu: 1500
+    peer: MY-own-peer
+    peer_interface: Ethernet123
+    peer_type: my_precious
+
+my_special_dci_ethernet_interfaces:
+  Ethernet4000:
+    ip_address: 10.3.2.1/21
+```
+
+In this example  `Ethernet4000` will be added to the `ethernet_interfaces` dictionary in the Structured Configuration and the ip_address will be `10.3.2.1/21` since ip_adddress was overridden on the later `custom_scructured_configuration_prefix`
 
 ## License
 
