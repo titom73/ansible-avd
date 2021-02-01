@@ -26,6 +26,27 @@
 {%    else %}
 No redsitribution configured
 {%    endif %}
+{# PREFIX Summary #}
+{%  set has.found = false %}
+{%    for process in router_ospf.process_ids %}
+{%      if router_ospf.process_ids[process].summary is arista.avd.defined %}
+{%         set has.found = true %}
+{%      endif %}
+{%    endfor %}
+### Router OSPF route summary
+{% if has.found is arista.avd.defined(true) %}
+| Process ID | Prefix | Tag | Attribute Route Map | Not Advertised |
+|------------|--------|-----|---------------------|----------------|
+{%    for process in router_ospf.process_ids %}
+{%       if router_ospf.process_ids[process].summary is arista.avd.defined %}
+{%           for summary in router_ospf.process_ids[process].summary %}
+| {{ process }} | {{ summary.prefix| arista.avd.default('-') }} | {{ summary.tag | arista.avd.default('-') }} | {{ summary.attribute_map | arista.avd.default('-') }} | {{ summary.not_advertise | arista.avd.default('-') }} |
+{%           endfor %}
+{%        endif %}
+{%    endfor %}
+{% else %}
+No prefix summary configured
+{% endif %}
 {# Interfaces #}
 {%  set ethernet_interface_ospf = namespace(configured=false) %}
 {%  set port_channel_interface_ospf = namespace(configured=false) %}
