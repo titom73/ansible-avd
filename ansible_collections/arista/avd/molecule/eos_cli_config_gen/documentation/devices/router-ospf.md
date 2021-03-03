@@ -311,12 +311,14 @@ Global ARP timeout not defined.
 | Process ID | Router ID | Default Passive Interface | No Passive Interface | BFD | Max LSA | Default Information Originate | Log Adjacency Changes Detail |
 | ---------- | --------- | ------------------------- | -------------------- | --- | ------- | ----------------------------- | ---------------------------- |
 | 100 | 192.168.255.3 |  enabled   |   Ethernet1 <br> Ethernet2 <br> Vlan4093 <br>|   enabled   | 12000 |  disabled  |  disabled |
-| 101 | 1.0.1.1 |  enabled   |   Ethernet2.101 <br>|   disabled   | default |  disabled  |   enabled |
+| 101 | 1.0.1.1 |  enabled   |   Ethernet2.101 <br>|   disabled   | default |   enabled   |   enabled |
+| 200 | 192.168.254.1 |  disabled   |  - |   disabled   | 5 |   Always    |   enabled |
 
 ### Router OSPF Router Redistribution
 
-No redsitribution configured
-### Router OSPF route summary
+| Process ID | Redistribute Connected | Redistribute Connected Route-map | Redistribute Static | Redistribute Static Route-map |
+| ---------- | ---------------------- | -------------------------------- | ------------------- | ----------------------------- |
+| 101 |  enabled | - |  enabled | - || 200 |  enabled | rm-ospf-connected |  enabled | rm-ospf-static |### Router OSPF route summary
 | Process ID | Prefix | Tag | Attribute Route Map | Not Advertised |
 |------------|--------|-----|---------------------|----------------|
 | 101 | 10.0.0.0/8 | - | - | - |
@@ -342,10 +344,21 @@ router ospf 101 vrf CUSTOMER01
    router-id 1.0.1.1
    passive-interface default
    no passive-interface Ethernet2.101
-   summary 10.0.0.0/8
-   summary 20.0.0.0/8 tag 10
-   summary 30.0.0.0/8 attribute-map RM-OSPF_SUMMARY
-   summary 40.0.0.0/8 not-advertise
+   default-information originate
+   redistribute static
+   redistribute connected
+   summary-address 10.0.0.0/8
+   summary-address 20.0.0.0/8 tag 10
+   summary-address 30.0.0.0/8 attribute-map RM-OSPF_SUMMARY
+   summary-address 40.0.0.0/8 not-advertise
+!
+router ospf 200 vrf ospf_zone
+   log-adjacency-changes detail
+   router-id 192.168.254.1
+   max-lsa 5
+   default-information originate always
+   redistribute static route-map rm-ospf-static
+   redistribute connected route-map rm-ospf-connected
 ```
 
 ## Router ISIS
